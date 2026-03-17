@@ -3,7 +3,7 @@
 ![Dashboard Overview](https://github.com/Mudit-Thakur/Indian-Beauty-Market-Analytics-Dashboard/blob/main/screenshots%20and%20reports/Overview.png)
 
 **Author:** Mudit Thakur  
-**Tech Stack:** Python, Pandas, Plotly, Dash, SQL (DuckDB/SQLite), CSV/Excel  
+**Tech Stack:** Python(Polars),PowerBi, SQL (DuckDB), CSV/Excel, Parquet.
 
 ---
 
@@ -25,7 +25,7 @@ This project showcases **practical skills in data cleaning, SQL, Python analytic
 - **Category Insights:** identify high-performing categories and growth opportunities  
 - **Customer Segmentation:** analyze contribution and behavior of different customer segments  
 - **Revenue Trends:** visualize daily, weekly, and monthly sales patterns  
-- **Interactive Dashboards:** drill-down analytics with dynamic charts using Plotly and Dash  
+- **Interactive Dashboards:** drill-down analytics with dynamic charts using PowerBi
 
 ---
 
@@ -50,10 +50,10 @@ This project showcases **practical skills in data cleaning, SQL, Python analytic
 | Layer             | Tools / Libraries                 |
 |------------------|----------------------------------|
 | Data Generation  | Python, Faker                     |
-| Data Processing  | Pandas, NumPy                     |
-| Data Storage     | CSV, Parquet, SQLite/DuckDB       |
-| Visualization    | Plotly, Dash                      |
-| Analytics        | SQL (DuckDB/SQLite), Pandas       |
+| Data Processing  | Polars                     |
+| Data Storage     | CSV, Parquet, DuckDB       |
+| Visualization    | PowerBi                      |
+| Analytics        | SQL (DuckDB), Polars       |
 | Version Control  | Git & GitHub                      |
 
 ---

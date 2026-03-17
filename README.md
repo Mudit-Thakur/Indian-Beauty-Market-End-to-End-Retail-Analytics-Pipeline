@@ -1,38 +1,37 @@
-
 # Indian Beauty Market Analytics Dashboard
 
-![Overview Preview](https://github.com/Mudit-Thakur/Indian-Beauty-Market-Analytics-Dashboard/blob/main/screenshots%20and%20reports/Overview.png)
+![Dashboard Overview](https://github.com/Mudit-Thakur/Indian-Beauty-Market-Analytics-Dashboard/blob/main/screenshots%20and%20reports/Overview.png)
 
 **Author:** Mudit Thakur  
-**Tech Stack:** Python, Pandas, Plotly, Dash, SQL (DuckDB/SQLite), Excel/CSV  
+**Tech Stack:** Python, Pandas, Plotly, Dash, SQL (DuckDB/SQLite), CSV/Excel  
 
 ---
 
 ## Overview
 
-The **Indian Beauty Market Analytics Dashboard** is an end-to-end analytics project that simulates real-world retail insights. It highlights **product performance, sales trends, and customer behavior** in the Indian beauty market, demonstrating practical data analytics and visualization skills.
+The **Indian Beauty Market Analytics Dashboard** is an end-to-end analytics project simulating real-world retail scenarios. It provides actionable insights on **product performance, sales trends, and customer behavior** in the Indian beauty market.
 
-**Key Objectives:**
+**Objectives:**
 - Identify top-selling products and high-performing categories  
 - Analyze revenue trends and customer segment contributions  
-- Provide interactive dashboards for actionable business insights  
+- Deliver interactive dashboards for business decision-making  
 
 ---
 
 ## 🚀 Features
 
-- **Product Performance Analysis** – revenue, transactions, and pricing trends  
-- **Category Insights** – revenue share, growth, and top performers  
-- **Customer Segmentation** – segment revenue contribution and behavior  
-- **Revenue Trends** – daily/weekly/monthly insights  
-- **Interactive Visualizations** – dynamic charts with Plotly/Dash  
+- **Product Performance Analysis:** revenue, transactions, and pricing trends  
+- **Category Insights:** revenue share, growth, and top performers  
+- **Customer Segmentation:** segment contribution and behavioral insights  
+- **Revenue Trends:** daily, weekly, and monthly analysis  
+- **Interactive Visualizations:** dynamic charts built with Plotly and Dash  
 
 ---
 
 ## 📊 Screenshots
 
 **Overview**  
-![Overview]([./screenshots/product_dashboard.png](https://github.com/Mudit-Thakur/Indian-Beauty-Market-Analytics-Dashboard/blob/main/screenshots%20and%20reports/Overview.png))  
+![Overview](https://github.com/Mudit-Thakur/Indian-Beauty-Market-Analytics-Dashboard/blob/main/screenshots%20and%20reports/Overview.png)  
 
 **Product Analysis**  
 ![Product Analysis](https://github.com/Mudit-Thakur/Indian-Beauty-Market-Analytics-Dashboard/blob/main/screenshots%20and%20reports/Product%20Analysis.png)
@@ -47,14 +46,14 @@ The **Indian Beauty Market Analytics Dashboard** is an end-to-end analytics proj
 
 ## 🛠 Tech Stack
 
-| Layer | Tools / Libraries |
-|-------|-----------------|
-| Data Generation | Python, Faker |
-| Data Processing | Pandas, NumPy |
-| Data Storage | CSV, Parquet, SQLite/DuckDB |
-| Visualization | Plotly, Dash |
-| Analytics | SQL (DuckDB/SQLite), Pandas |
-| Version Control | Git & GitHub |
+| Layer             | Tools / Libraries                 |
+|------------------|----------------------------------|
+| Data Generation  | Python, Faker                     |
+| Data Processing  | Pandas, NumPy                     |
+| Data Storage     | CSV, Parquet, SQLite/DuckDB       |
+| Visualization    | Plotly, Dash                      |
+| Analytics        | SQL (DuckDB/SQLite), Pandas       |
+| Version Control  | Git & GitHub                      |
 
 ---
 
@@ -63,35 +62,33 @@ The **Indian Beauty Market Analytics Dashboard** is an end-to-end analytics proj
 1. Clone the repository:
 ```bash
 git clone https://github.com/Mudit-Thakur/Indian-Beauty-Market-Analytics-Dashboard.git
-````
 
-2. Install dependencies:
+Install dependencies:
 
-```bash
 pip install -r requirements.txt
-```
----
 
-## 🌟 Project Highlights
+Launch the dashboard:
 
-* **Real-world analytics workflow**: simulates retail and FMCG business scenarios
-* **High-impact skills**: SQL querying, data cleaning, interactive dashboards, segmentation analysis
-* **Business insights**: actionable metrics for marketing and strategy decisions
+python app.py
+🌟 Project Highlights
 
----
+Real-world workflow: simulates retail/FMCG analytics scenarios
 
-## 🔮 Future Enhancements
+High-impact skills: SQL querying, data cleaning, interactive dashboards, segmentation analysis
 
-* Integration with **live sales data via APIs**
-* Predictive analytics for **product demand forecasting**
-* Advanced **customer segmentation** using ML clustering
-* Comparative dashboards for **multi-category market insights**
+Actionable insights: metrics to support marketing and strategy decisions
 
----
+🔮 Future Enhancements
 
-## 📬 Contact
+Integration with live sales data via APIs
 
-**Mudit Thakur**
-[GitHub](https://github.com/Mudit-Thakur) | [Email](muditthakur918@gmail.com)
+Predictive analytics for product demand forecasting
 
-```
+Advanced customer segmentation using ML clustering
+
+Comparative dashboards for multi-category market insights
+
+📬 Contact
+
+Mudit Thakur
+GitHub | Email

@@ -1,4 +1,4 @@
-# Indian Beauty Market Analytics Dashboard
+## Indian Beauty Market Analytics Dashboard
 
 ![Dashboard Overview](https://github.com/Mudit-Thakur/Indian-Beauty-Market-Analytics-Dashboard/blob/main/screenshots%20and%20reports/Overview.png)
 
@@ -69,7 +69,7 @@ git clone https://github.com/Mudit-Thakur/Indian-Beauty-Market-Analytics-Dashboa
 pip install -r requirements.txt
 ```
 
-🌟 Portfolio Highlights
+## 🌟 Portfolio Highlights
 
 End-to-end analytics workflow: simulate retail and FMCG business scenarios
 
@@ -77,7 +77,7 @@ High-impact skills demonstrated: SQL querying, data cleaning, visualization, seg
 
 Actionable insights for business: metrics supporting marketing, product, and strategy decisions
 
-🔮 Future Enhancements
+## 🔮 Future Enhancements
 
 Integrate live sales data via APIs for real-time dashboards
 
@@ -87,7 +87,7 @@ Advanced ML-based customer segmentation
 
 Comparative dashboards for multi-category market insights
 
-📬 Contact
+## 📬 Contact
 
-Mudit Thakur
-GitHub | Email
+**Mudit Thakur**  
+[GitHub](https://github.com/Mudit-Thakur) | [Email](mailto:muditthakur918@gmail.com)

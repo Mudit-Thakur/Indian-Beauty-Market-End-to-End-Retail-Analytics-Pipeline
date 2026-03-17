@@ -70,6 +70,8 @@ pip install -r requirements.txt
 Launch the dashboard:
 
 python app.py
+
+```
 🌟 Project Highlights
 
 Real-world workflow: simulates retail/FMCG analytics scenarios

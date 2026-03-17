@@ -9,22 +9,23 @@
 
 ## Overview
 
-The **Indian Beauty Market Analytics Dashboard** is an end-to-end analytics project simulating real-world retail scenarios. It provides actionable insights on **product performance, sales trends, and customer behavior** in the Indian beauty market.
+The **Indian Beauty Market Analytics Dashboard** is a portfolio project demonstrating end-to-end analytics applied to retail. It simulates **real-world business scenarios**, providing actionable insights on:
 
-**Objectives:**
-- Identify top-selling products and high-performing categories  
-- Analyze revenue trends and customer segment contributions  
-- Deliver interactive dashboards for business decision-making  
+- **Product performance** – top sellers, pricing, and revenue trends  
+- **Category performance** – growth, revenue share, and high-impact segments  
+- **Customer behavior** – segmentation, purchasing trends, and city-level insights  
+
+This project showcases **practical skills in data cleaning, SQL, Python analytics, and interactive dashboards**, highlighting measurable business impact.
 
 ---
 
-## 🚀 Features
+## 🚀 Key Features
 
-- **Product Performance Analysis:** revenue, transactions, and pricing trends  
-- **Category Insights:** revenue share, growth, and top performers  
-- **Customer Segmentation:** segment contribution and behavioral insights  
-- **Revenue Trends:** daily, weekly, and monthly analysis  
-- **Interactive Visualizations:** dynamic charts built with Plotly and Dash  
+- **Product Performance Analysis:** revenue, transactions, and pricing trends for actionable product decisions  
+- **Category Insights:** identify high-performing categories and growth opportunities  
+- **Customer Segmentation:** analyze contribution and behavior of different customer segments  
+- **Revenue Trends:** visualize daily, weekly, and monthly sales patterns  
+- **Interactive Dashboards:** drill-down analytics with dynamic charts using Plotly and Dash  
 
 ---
 
@@ -62,31 +63,27 @@ The **Indian Beauty Market Analytics Dashboard** is an end-to-end analytics proj
 1. Clone the repository:
 ```bash
 git clone https://github.com/Mudit-Thakur/Indian-Beauty-Market-Analytics-Dashboard.git
-
-Install dependencies:
-
-pip install -r requirements.txt
-
-Launch the dashboard:
-
-python app.py
-
 ```
-🌟 Project Highlights
+2 Install dependencies:
+```
+pip install -r requirements.txt
+```
 
-Real-world workflow: simulates retail/FMCG analytics scenarios
+🌟 Portfolio Highlights
 
-High-impact skills: SQL querying, data cleaning, interactive dashboards, segmentation analysis
+End-to-end analytics workflow: simulate retail and FMCG business scenarios
 
-Actionable insights: metrics to support marketing and strategy decisions
+High-impact skills demonstrated: SQL querying, data cleaning, visualization, segmentation analysis
+
+Actionable insights for business: metrics supporting marketing, product, and strategy decisions
 
 🔮 Future Enhancements
 
-Integration with live sales data via APIs
+Integrate live sales data via APIs for real-time dashboards
 
-Predictive analytics for product demand forecasting
+Implement predictive analytics for product demand forecasting
 
-Advanced customer segmentation using ML clustering
+Advanced ML-based customer segmentation
 
 Comparative dashboards for multi-category market insights
 

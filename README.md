@@ -19,8 +19,8 @@
 
 Simulates **50,000 transactions** across 1,000 customers and 10 beauty products in the Indian retail market. Demonstrates a complete analytics workflow — data generation, ETL, SQL analytics, customer segmentation, and interactive dashboards — delivering insights that directly inform marketing, inventory, and sales strategy.
 
-> 📖 **[Data Dictionary](DATA_DICTIONARY.md)** — field definitions, generation logic, and synthetic data limitations  
-> 📊 **[Executive Report](EXECUTIVE_REPORT.md)** — full KPI results with concrete numbers from the analysis
+> 📖 **[Data Dictionary](https://github.com/Mudit-Thakur/Indian-Beauty-Market-Analytics-Dashboard/blob/main/data%20dict%20%26%20report/DATA_DICTIONARY.md)** — field definitions, generation logic, and synthetic data limitations  
+> 📊 **[Executive Report](https://github.com/Mudit-Thakur/Indian-Beauty-Market-Analytics-Dashboard/blob/main/data%20dict%20%26%20report/EXECUTIVE_REPORT.md)** — full KPI results with concrete numbers from the analysis
 
 **Business hypotheses tested:**
 - Do festival campaigns meaningfully lift revenue — and is it volume or ticket size driving the increase?

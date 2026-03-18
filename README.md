@@ -11,7 +11,7 @@
 
 ---
 
-![Dashboard Overview](https://github.com/Mudit-Thakur/Indian-Beauty-Market-Analytics-Dashboard/blob/main/screenshots%20and%20reports/Overview.png)
+![Dashboard Overview](https://github.com/Mudit-Thakur/Indian-Beauty-Market-Analytics-Dashboard/blob/main/screenshots/Overview.png)
 
 ---
 
@@ -51,11 +51,11 @@ Simulates **50,000 transactions** across 1,000 customers and 10 beauty products 
 
 | Overview | Product Analysis |
 |:---:|:---:|
-| ![Overview](https://github.com/Mudit-Thakur/Indian-Beauty-Market-Analytics-Dashboard/blob/main/screenshots%20and%20reports/Overview.png) | ![Product Analysis](https://github.com/Mudit-Thakur/Indian-Beauty-Market-Analytics-Dashboard/blob/main/screenshots%20and%20reports/Product%20Analysis.png) |
+| ![Overview](https://github.com/Mudit-Thakur/Indian-Beauty-Market-Analytics-Dashboard/blob/main/screenshots/Overview.png) | ![Product Analysis](https://github.com/Mudit-Thakur/Indian-Beauty-Market-Analytics-Dashboard/blob/main/screenshots/Product%20Analysis.png) |
 
 | Customer & City Analytics | Festival Analytics |
 |:---:|:---:|
-| ![Customer & City Analytics](https://github.com/Mudit-Thakur/Indian-Beauty-Market-Analytics-Dashboard/blob/main/screenshots%20and%20reports/Customer%20%26%20City%20Analytics.png) | ![Festival Analytics](https://github.com/Mudit-Thakur/Indian-Beauty-Market-Analytics-Dashboard/blob/main/screenshots%20and%20reports/Festival%20Analysis.png) |
+| ![Customer & City Analytics](https://github.com/Mudit-Thakur/Indian-Beauty-Market-Analytics-Dashboard/blob/main/screenshots/Customer%20%26%20City%20Analytics.png) | ![Festival Analytics](https://github.com/Mudit-Thakur/Indian-Beauty-Market-Analytics-Dashboard/blob/main/screenshots/Festival%20Analysis.png) |
 
 ---
 

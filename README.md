@@ -115,7 +115,7 @@ Simulates **50,000 transactions** across 1,000 customers and 10 beauty products 
 ```
 Indian-Beauty-Market-Analytics-Dashboard/
 │
-├── src/                                     # ← Modular production scripts
+├── pipelines/                               # ← Modular production scripts
 │   └── etl_pipeline.py                      # Data generation + cleaning pipeline
 │
 ├── data/
@@ -146,8 +146,8 @@ Indian-Beauty-Market-Analytics-Dashboard/
 │   └── 11_day11_duckdb_analysis.ipynb       # SQL analytics on Parquet
 │
 ├── screenshots and reports/
-    ├── DATA_DICTIONARY.md                       # ← Field definitions & generation logic
-    └── EXECUTIVE_REPORT.md                      # ← Full KPI results with numbers
+    ├── DATA_DICTIONARY.md                   # ← Field definitions & generation logic
+    └── EXECUTIVE_REPORT.md                  # ← Full KPI results with numbers
 └── README.md
 ```
 ---

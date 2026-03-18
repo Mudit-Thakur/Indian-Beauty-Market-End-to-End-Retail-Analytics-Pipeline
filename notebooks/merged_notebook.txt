@@ -1,0 +1,2152 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# # 01_day1_generate_code.ipynb
+# ==================================================
+
+# ## Importing and Setup
+# 
+
+# In[1]:
+
+
+# Install libraries from inside the notebook
+get_ipython().run_line_magic('pip', 'install polars pandas numpy faker plotly scikit-learn xgboost streamlit --quiet')
+
+
+# In[ ]:
+
+
+# Importing required libraries for data handling and random data generation
+import polars as pl
+import pandas as pd
+import numpy as np
+import random
+from pathlib import Path
+from faker import Faker
+
+# Setup Faker to generate Indian names and cities
+faker = Faker("en_IN")
+
+# Define the data folder path (already created)
+# This insures CSV are stored in the correct folder automatically
+data_folder = Path(
+    "/Users/Mudit PC/OneDrive/Desktop/Data analytics projects/Indian_Beauty_Analytics/data/"
+)
+
+
+# ## Generate Product Data
+# 
+
+# In[3]:
+
+
+# Define a list of products with product_id, name, category and price
+products = [
+    {"product_id": f"p{i}", "product_name": name, "category": cat, "price": price}
+    for i, (name, cat, price) in enumerate(
+        [
+            ("Aloe Vera Gel", "Skincare", 299),
+            ("Vitamin C Serum", "Skincare", 499),
+            ("Herbal Shampoo", "Haircare", 199),
+            ("Lip Balm", "Makeup", 149),
+            ("Face Wash", "Skincare", 399),
+            ("Sunscreen SPF50", "Skincare", 599),
+            ("Hair Oil", "Haircare", 249),
+            ("Body Lotion", "Skincare", 349),
+            ("Nail Polish", "Makeup", 199),
+            ("Face Pack", "Skincare", 299)
+        ]
+    )
+]
+
+# Convert the product list into a polars DataFrame
+products_df = pl.DataFrame(products)
+
+# Save the products DataFrame to csv inside the data folder
+products_df.write_csv(data_folder / "products.csv")
+
+# Display the first few rows of the products DataFrame
+products_df.head()
+
+
+# ## Generate Customer Data
+# 
+
+# In[4]:
+
+
+# Set the number of customers to generate
+num_customers = 1000
+
+# Initialize an emply list to store customer dictionaries
+customers = []
+
+# Loop to generate each customer
+for i in range(num_customers):
+    customers.append({
+        "customer_id": f"c{i}",  # Unique Customer ID
+        "name": faker.name(),    # Random Indian Customer Name
+        "city": faker.city(),   # Random Indian City
+        "age": random.randint(18, 55),  # Random Age between 18 and 55
+        "gender": random.choice(["Male", "Female"]),  # Random Gender
+    }
+    )
+
+# Convert the customer list into a polars DataFrame
+customers_df = pl.DataFrame(customers)
+
+# Save the customers DataFrame to csv inside the data folder
+customers_df.write_csv(data_folder / "customers.csv")
+
+# Display the first few rows of the customers DataFrame
+customers_df.head()
+
+
+# ## Generate Transactions
+# 
+
+# In[ ]:
+
+
+# Set the number of transactions to generate
+num_transactions = 50000
+
+# Initialize an empty list to store transaction dictionaries
+transactions = []
+
+# Define festival periods with start and end dates
+festivals = {
+    "Diwali": ("2024-10-10", "2024-11-10"),
+    "Holi": ("2024-03-01", "2024-03-31"),
+    "Summer": ("2024-05-01", "2024-06-30")
+}
+
+# Helper function to pick a random date between start and end
+
+
+def random_date(start, end):
+    return pd.to_datetime(np.random.choice(pd.date_range(start, end)))
+
+
+# Loop to generate each transaction
+for i in range(num_transactions):
+    # Randomly pick a customer
+    customer = customers_df.sample(1).to_dict(as_series=False)
+
+    # Randomly pick a product
+    product = products_df.sample(1).to_dict(as_series=False)
+
+    # 20% chance the purchase happens during a festival
+    if random.random() < 0.2:
+        fest = random.choice(list(festivals.keys()))
+        purchase_date = random_date(festivals[fest][0], festivals[fest][1])
+        festival = fest
+    else:
+        # Non-festival purchase
+        purchase_date = random_date("2024-01-01", "2024-12-31")
+        festival = None
+
+    # Add the transaction record to the list
+    transactions.append({
+        "transaction_id": f"T{i}",                    # Unique transaction ID
+        "customer_id": customer["customer_id"][0],   # Customer ID
+        "product_id": product["product_id"][0],      # Product ID
+        "purchase_date": purchase_date,              # Purchase date
+        "price": product["price"][0],                # Product price
+        "city": customer["city"][0],                 # Customer city
+        "festival": festival                          # Festival name or None
+    })
+
+# Convert the list of transactions into a Polars DataFrame
+transactions_df = pl.DataFrame(transactions)
+
+# Save the transactions DataFrame to CSV inside the data folder
+transactions_df.write_csv(data_folder / "transactions.csv")
+
+# Display the first few rows of the transactions DataFrame
+transactions_df.head()
+
+
+# ## Quick Exploration
+# 
+
+# In[8]:
+
+
+# Display top products by number of transactions
+print("Top Products by Sales")
+
+print(
+    transactions_df
+    .group_by("product_id")
+    .agg(
+        pl.count().alias("transaction_count")
+    )
+    .sort("transaction_count", descending=True)
+    .head(5)
+)
+
+
+# Display cities with the most transactions
+print("\nTop Cities by Transactions")
+
+print(
+    transactions_df
+    .group_by("city")
+    .agg(
+        pl.count().alias("transaction_count")
+    )
+    .sort("transaction_count", descending=True)
+    .head(5)
+)
+
+
+# Display number of purchases during festivals
+print("\nFestival Purchases")
+
+print(
+    transactions_df
+    .group_by("festival")
+    .agg(
+        pl.count().alias("transaction_count")
+    )
+    .sort("transaction_count", descending=True)
+)
+
+
+# In[9]:
+
+
+# Verifying dataset size
+print(transactions_df.shape)
+
+
+# # 02_day2_data_cleaning.ipynb
+# ==================================================
+
+# ## Imports
+# 
+
+# In[2]:
+
+
+# Import Required Libraries
+import polars as pl
+from pathlib import Path
+
+
+# ## Define Data Path
+# 
+
+# In[3]:
+
+
+# Define the path to the data folder
+data_folder = Path(
+    "C:/Users/Mudit PC/OneDrive/Desktop/Data analytics projects/Indian_Beauty_Analytics/data")
+
+
+# ## Load the datasets
+# 
+
+# In[4]:
+
+
+# Load the customers dataset
+customers_df = pl.read_csv(data_folder / "customers.csv")
+
+# Load the products dataset
+products_df = pl.read_csv(data_folder / "products.csv")
+
+# Load the transactions dataset
+transactions_df = pl.read_csv(data_folder / "transactions.csv")
+
+
+# ## Inspecting the Datasets
+# 
+
+# In[5]:
+
+
+# Display first rows of customers dataset
+customers_df.head()
+
+# Display first rows of products dataset
+products_df.head()
+
+# Display first rows of transactions dataset
+transactions_df.head()
+
+
+# ## Check dataset structure
+# 
+
+# In[6]:
+
+
+# Show schema of customers dataset
+customers_df.schema
+
+# Show schema of products dataset
+products_df.schema
+
+# Show schema of transactions dataset
+transactions_df.schema
+
+
+# ## Convert purchase date to datetime
+# 
+
+# In[7]:
+
+
+# Convert purchase_date column to datetime format
+transactions_df = transactions_df.with_columns(
+    pl.col("purchase_date").str.to_datetime())
+
+
+# In[8]:
+
+
+transactions_df.schema
+
+
+# ## Check for null values
+# 
+
+# In[9]:
+
+
+# check missing values in transactions dataset
+transactions_df.null_count()
+
+# check missing values in products dataset
+products_df.null_count()
+
+# check missing values in customers dataset
+customers_df.null_count()
+
+
+# ## Validate dataset sizes
+# 
+
+# In[10]:
+
+
+print(transactions_df.shape)
+
+print(products_df.shape)
+
+print(customers_df.shape)
+
+
+# ## Join product information to transactions
+# 
+# Transactions alone are not useful. we need product metadata
+# 
+
+# In[11]:
+
+
+# Join transactions with products information
+sales_df = transactions_df.join(
+    products_df,
+    on="product_id",
+    how="left"
+)
+
+# Dropping the redundant columns
+sales_df = sales_df.drop("price_right")
+
+sales_df.head()
+
+
+# ## Join customer information
+# 
+
+# In[12]:
+
+
+# Join customer information
+sales_df = sales_df.join(
+    customers_df,
+    on="customer_id",
+    how="left"
+)
+
+# Dropping the redundant columns
+sales_df = sales_df.drop("city_right")
+
+sales_df.head()
+
+
+# ## Create revenue column
+# 
+# Revenue is the core business metric
+# 
+
+# In[13]:
+
+
+# Create revenue column based on product price
+sales_df = sales_df.with_columns(
+    pl.col("price").alias("revenue")
+)
+
+
+# ## Revenue by product
+# 
+
+# In[14]:
+
+
+# Calculate revenue by products
+sales_df.group_by("product_name").agg(
+    pl.col("revenue").sum().alias("total_revenue")
+).sort("total_revenue", descending=True)
+
+
+# ## Revenue by city
+# 
+
+# In[15]:
+
+
+# Calculate revenue by city
+sales_df.group_by("city").agg(
+    pl.col("revenue").sum().alias("total_revenue")
+).sort("total_revenue", descending=True)
+
+
+# ## Revenue by festival
+# 
+
+# In[16]:
+
+
+# Calculate revenue by fesitval
+
+sales_df.group_by("festival").agg(
+    pl.col("revenue").sum().alias("total_revenue")
+).sort("total_revenue", descending=True)
+
+
+# ## Check top selling products
+# 
+
+# In[17]:
+
+
+# Count number of transcations per product
+
+sales_df.group_by("product_name").count().sort("count", descending=True)
+
+
+# ## Reordering for better readability
+# 
+
+# In[18]:
+
+
+# Reorder columns for cleaner analytics structure
+sales_df = sales_df.select([
+    "transaction_id",
+    "customer_id",
+    "product_id",
+    "purchase_date",
+    "festival",
+    "city",
+    "product_name",
+    "category",
+    "name",
+    "age",
+    "gender",
+    "price",
+    "revenue"
+])
+
+
+# In[19]:
+
+
+# Renaming name column for better readability
+sales_df = sales_df.rename({
+    "name": "customer_name"
+})
+
+
+# In[20]:
+
+
+sales_df.select(pl.col("transaction_id").n_unique())
+
+
+# In[21]:
+
+
+sales_df.schema
+
+
+# In[22]:
+
+
+sales_df = sales_df.sort("purchase_date")
+
+
+# ## Saving the data set in csv file
+# 
+
+# In[23]:
+
+
+# Save cleaned sales dataset
+sales_df.write_csv(data_folder / "sales_cleaned.csv")
+
+
+# ## Saving the data set in parquet
+# 
+
+# In[24]:
+
+
+sales_df.write_parquet(data_folder / "sales_cleaned.parquet")
+
+
+# # 03_day3_rfm_analysis.ipynb
+# ==================================================
+
+# ## Importing libraries
+# 
+
+# In[2]:
+
+
+# Import Polars for dataframe operations
+import polars as pl
+
+# Import Path for managing file paths
+from pathlib import Path
+
+
+# ## Define Data folder
+# 
+
+# In[3]:
+
+
+# Define path to data folder
+data_folder = Path("../data")
+
+
+# ## Load Cleaned Dataset (Parquet Version)
+# 
+
+# In[ ]:
+
+
+# Load cleaned sales dataset
+sales_df = pl.read_parquet(data_folder / "sales_cleaned.parquet")
+
+# Check data types
+print(sales_df.schema)
+
+# preview data set
+sales_df.head()
+
+print("Rows:", sales_df.height)
+print("Columns:", sales_df.width)
+
+
+# ## Find Latest Purchase Date
+# 
+
+# In[10]:
+
+
+# Find the most recent purchase date
+latest_date = sales_df.select(pl.col("purchase_date").max()).item()
+latest_date
+
+
+# ## Calculate Recency
+# 
+# Recency = Days since last purchase
+# 
+
+# In[12]:
+
+
+# Get last purchase date per customer
+receny_df = sales_df.group_by("customer_id").agg(
+    pl.col("purchase_date").max().alias("last_purchase")
+)
+
+# Calculate recency
+
+receny_df = receny_df.with_columns(
+    (latest_date - pl.col("last_purchase")).dt.total_days().alias("recency")
+)
+
+receny_df.head()
+
+
+# ## Calculate Frequency
+# 
+# Frequency = number of purchases
+# 
+
+# In[13]:
+
+
+# Count purchases per customer
+
+frequency_df = sales_df.group_by("customer_id").agg(
+    pl.count().alias("frequency")
+)
+
+frequency_df.head()
+
+
+# ## Calculate Monetary Value
+# 
+# Monetary = total revenue spent
+# 
+
+# In[17]:
+
+
+# Calculate total revenue per customer
+
+monetary_df = sales_df.group_by("customer_id").agg(
+    pl.col("revenue").sum().alias("monetary")
+)
+
+monetary_df.head()
+
+
+# ## Merge RFM Metrics
+# 
+
+# In[18]:
+
+
+# Merge recency, frequency and monetary tables
+rfm_df = receny_df.join(frequency_df, on="customer_id").join(
+    monetary_df, on="customer_id"
+)
+
+rfm_df.head()
+
+
+# ## Create RFM Scores
+# 
+
+# In[20]:
+
+
+# Create RFM scores using rank
+
+rfm_df = rfm_df.with_columns(
+    [
+        pl.col("recency").rank("dense").alias("r_score"),
+        pl.col("frequency").rank("dense").alias("f_score"),
+        pl.col("monetary").rank("dense").alias("m_score"),
+    ]
+)
+
+rfm_df.head()
+
+
+# ## Create RFM Score
+# 
+
+# In[ ]:
+
+
+# Combine RFM scores
+
+rfm_df = rfm_df.with_columns(
+    (
+        pl.col("r_score") +
+        pl.col("f_score") +
+        pl.col("m_score")
+    )
+    .alias("rfm_score")
+)
+
+rfm_df.head()
+
+
+# ## Create Customer Segments
+# 
+
+# In[ ]:
+
+
+# Assign customer segments
+
+rfm_df = rfm_df.with_columns(
+    pl.when(pl.col("rfm_score") >= 1500).then(pl.lit("Champions"))
+    .when(pl.col("rfm_score") >= 1200).then(pl.lit("Loyal Customers"))
+    .when(pl.col("rfm_score") >= 600).then(pl.lit("Potential Loyalists"))
+    .otherwise(pl.lit("At Risk"))
+    .alias("segment")
+)
+
+rfm_df.head()
+
+
+# ## Segmet Distribution
+# 
+
+# In[34]:
+
+
+# Count customers per segment
+
+rfm_df.group_by("segment").count().sort("count", descending=True)
+
+
+# ## Save Dataset
+# 
+
+# In[ ]:
+
+
+# Save RFM dataframe as csv
+rfm_df.write_csv(data_folder / "customer_rfm.csv")
+
+
+# In[36]:
+
+
+# Save RFM dataframe as parquet
+rfm_df.write_parquet(data_folder / "customer_rfm.parquet")
+
+
+# # Sanity Check
+
+# In[37]:
+
+
+rfm_df.describe()
+
+
+# In[38]:
+
+
+rfm_df.group_by("segment").count()
+
+
+# # 04_day4_cohort_retention.ipynb
+# ==================================================
+
+# # Importing Libraries
+# 
+
+# In[1]:
+
+
+# Import Polars for dataframe operations
+import polars as pl
+
+# Import Path to manage fiel paths
+from pathlib import Path
+
+
+# ## Define Data Path
+# 
+
+# In[2]:
+
+
+# Define path to the data folder
+data_folder = Path("../data")
+
+
+# # Load Cleaned Dataset
+# 
+
+# In[3]:
+
+
+# Load cleaned sales dataset
+sales_df = pl.read_parquet(data_folder / "sales_cleaned.parquet")
+
+# Preview Dataset
+sales_df.head()
+
+
+# ## Extract Purchase Month
+# 
+# skipped purchase_date to datetime since it already exists.
+# 
+
+# In[6]:
+
+
+# Extract purchase month
+sales_df = sales_df.with_columns(
+    pl.col("purchase_date")
+    .dt.truncate("1mo")
+    .alias("purchase_month")
+)
+
+# Quick Check
+sales_df.select(["purchase_date", "purchase_month"]).head()
+
+
+# # Identify Customer First Purchase (Cohort)
+# 
+# Each customer belongs to the month they first purchased.
+# 
+
+# In[9]:
+
+
+# Find first purchase month for each customer
+cohort_df = sales_df.group_by("customer_id").agg(
+    pl.col("purchase_month").min().alias("cohort_month")
+)
+
+cohort_df.head()
+
+
+# ## Join Cohort Back to Transactions
+# 
+
+# In[ ]:
+
+
+# Merge cohort info into sales data
+sales_cohort_df = sales_df.join(cohort_df, on="customer_id")
+
+# Quick Check
+sales_cohort_df.head()
+
+
+# ## Calculating Cohort Index
+# 
+# cohort index = months since first purchase
+# 
+
+# In[ ]:
+
+
+# Calculate months since first purchase
+sales_cohort_df = sales_cohort_df.with_columns(
+    (
+        (pl.col("purchase_month").dt.year() -
+         pl.col("cohort_month").dt.year()) * 12
+        + (pl.col("purchase_month").dt.month() -
+           pl.col("cohort_month").dt.month())
+    ).alias("cohort_index")
+)
+
+sales_cohort_df.head()
+
+
+# In[ ]:
+
+
+# Quick Check
+sales_cohort_df.select(
+    ["purchase_month", "cohort_month", "cohort_index"]).tail(10)
+
+
+# ## Count Active Customers Per Cohort
+# 
+
+# In[16]:
+
+
+# Count customers in each cohort period
+cohort_counts = sales_cohort_df.group_by(
+    ["cohort_month", "cohort_index"]
+).agg(pl.col("customer_id").n_unique().alias("customers"))
+
+cohort_counts.tail()
+
+
+# ## Get Cohort Sizes
+# 
+
+# In[ ]:
+
+
+# Get initial cohort size
+cohort_sizes = cohort_counts.filter(pl.col("cohort_index") == 0
+                                    ).select(["cohort_month", "customers"]
+                                             ).rename({"customers": "cohort_size"})
+
+
+# ## Calculate Retention Rate
+# 
+
+# In[21]:
+
+
+# Merge cohort size
+cohort_retention = cohort_counts.join(
+    cohort_sizes, on="cohort_month"
+)
+
+# Calculate retention rate
+cohort_retention = cohort_retention.with_columns(
+    (pl.col("customers") / pl.col("cohort_size")).alias("retention_rate")
+)
+
+cohort_retention.head()
+
+
+# ## Save Dataset
+# 
+
+# In[ ]:
+
+
+# Save cohort retention dataset
+cohort_retention.write_csv(data_folder / "cohort_retention.csv")
+
+# Save parquet version
+cohort_retention.write_parquet(data_folder / "cohort_retention.parquet")
+
+
+# # 05_day5_customer_behavior.ipynb
+# ==================================================
+
+# ## Import Libraries
+# 
+
+# In[2]:
+
+
+# Import Polars for dataframe analytics
+import polars as pl
+# Improt Path to manage file paths
+from pathlib import Path
+
+
+# ## Define Data Path
+# 
+
+# In[3]:
+
+
+# Define data folder path
+data_folder = Path("../data")
+
+
+# ## Load Cleaned Dataset
+# 
+
+# In[4]:
+
+
+# Load cleaned sales dataset
+sales_df = pl.read_parquet(data_folder / "sales_cleaned.parquet")
+
+# Preview Dataset
+sales_df.head()
+
+
+# ## Create Customer-Level Metrics
+# 
+
+# In[5]:
+
+
+# Aggregate customer level behavior
+customer_metrics = (sales_df.group_by("customer_id").agg(
+
+    # Total orders per customer
+    pl.len().alias("total_orders"),
+
+    # Total money spent
+    pl.col("revenue").sum().alias("total_spent"),
+
+    # Average order value
+    pl.col("revenue").mean().alias("avg_order_value"),
+
+    # First Purchase date
+    pl.col("purchase_date").min().alias("first_purchase"),
+
+    # Last purchase date
+    pl.col("purchase_date").max().alias("last_purchase")
+
+)
+)
+customer_metrics.head()
+
+
+# ## Calculate Customer Lifetime
+# 
+
+# In[6]:
+
+
+# Calculate customer lifetime in days
+customer_metrics = customer_metrics.with_columns(
+    (pl.col("last_purchase") - pl.col("first_purchase")
+     ).dt.total_days().alias("customer_lifetime_days")
+)
+
+customer_metrics.tail(10)
+
+
+# ## Calculate Purchase Frequency
+# 
+
+# In[7]:
+
+
+# Purchase frequecy = orders / lifetime
+customer_metrics = customer_metrics.with_columns(
+    (
+        pl.col("total_orders") / (pl.col("customer_lifetime_days")+1
+                                  )
+    ).alias("purchase_frequency")
+)
+
+# Note:- adding +1 avoids divide by 0 for single purchase customer
+customer_metrics.head()
+
+
+# # Save Customer Level Dataset
+# 
+# This dataset will later power segmentation and churn analysis
+# 
+
+# In[8]:
+
+
+# Save customer level metrics
+customer_metrics.write_csv(data_folder / "customer_level_metrics.csv")
+
+# Save customer level metrics in parquet
+customer_metrics.write_parquet(data_folder / "customer_level_metrics.parquet")
+
+
+# ## Calculate Global KPIs
+# 
+# Computing business-level metrics.
+# 
+
+# In[9]:
+
+
+# Total customers
+total_customers = sales_df.select(
+    pl.col("customer_id").n_unique()
+).item()
+
+# Total orders
+total_orders = sales_df.height
+
+# Total revenue
+total_revenue = sales_df.select(
+    pl.col("revenue").sum()
+).item()
+
+
+# ## Calculate Ecommerce Metrics
+# 
+
+# In[10]:
+
+
+# Average order value
+aov = total_revenue / total_orders
+
+# Purhcase frequency
+purchase_frequency = total_orders / total_customers
+
+# Revenue per customer
+revenue_per_customer = total_revenue / total_customers
+
+
+# ## Repeat Purchase Rate
+# 
+
+# In[11]:
+
+
+# Customers with multiple purchases
+repeat_customers = customer_metrics.filter(
+    pl.col("total_orders") > 1
+).height
+
+repeat_purchase_rate = repeat_customers / total_customers
+
+print("Repeat Customer:", repeat_customers)
+print("Repeat Purchase Rate:", repeat_purchase_rate)
+
+
+# ## Create KPI Tables
+# 
+
+# In[12]:
+
+
+# Create KPI dataframe
+metrics_df = pl.DataFrame(
+    {
+        "metric": [
+            "Total Customers",
+            "Total Orders",
+            "Total Revenue",
+            "Average Order Value",
+            "Purchase Frequency",
+            "Revenue per Customer",
+            "Repeat Customers",
+            "Repeat Purchase Rate"
+        ],
+        "value": [
+            float(total_customers),
+            float(total_orders),
+            float(total_revenue),
+            round(aov, 2),
+            round(purchase_frequency, 2),
+            round(revenue_per_customer, 2),
+            round(repeat_customers, 2),
+            round(repeat_purchase_rate, 2)
+        ]
+    }
+)
+
+metrics_df
+
+
+# In[13]:
+
+
+metrics_df.sort("value", descending=True)
+
+
+# In[14]:
+
+
+customer_metrics.sort("total_orders", descending=True).head()
+
+
+# In[15]:
+
+
+customer_metrics.describe()
+
+
+# In[16]:
+
+
+customer_metrics.select([
+    pl.col("total_orders").min().alias("min_orders"),
+    pl.col("total_orders").mean().alias("avg_orders"),
+    pl.col("total_orders").max().alias("max_orders")
+])
+
+
+# ## Save Metrics Dataset
+# 
+
+# In[17]:
+
+
+# Save KPI Dataset
+metrics_df.write_csv(data_folder / "customer_behavior_metrics.csv")
+
+metrics_df.write_parquet(data_folder / "customer_behavior_metrics.parquet")
+
+
+# # Adding Customer Segmentation
+
+# In[36]:
+
+
+customer_metrics = customer_metrics.with_columns(
+
+    pl.when(pl.col("total_spent") > 30000).then(pl.lit("VIP"))
+    .when(pl.col("total_orders") >= 30).then(pl.lit("Loyal"))
+    .when(pl.col("total_orders") >= 10).then(pl.lit("Regular"))
+    .otherwise(pl.lit("Low Value"))
+    .alias("customer_type")
+
+)
+
+
+# In[37]:
+
+
+customer_metrics.group_by("customer_type").count()
+
+
+# In[38]:
+
+
+sales_encriched = sales_df.join(
+    customer_metrics.select(["customer_id", "customer_type"]),
+    on="customer_id",
+    how="left"
+)
+
+
+# In[39]:
+
+
+sales_encriched.select("customer_type").unique()
+
+
+# In[40]:
+
+
+sales_encriched.write_parquet(data_folder / "sales_encriched.parquet")
+
+
+# In[ ]:
+
+
+
+
+
+# # 06_day6_product_performance.ipynb
+# ==================================================
+
+# # Importing Libraries
+
+# In[100]:
+
+
+# Import polars for analytics
+import polars as pl
+
+# Path for data folder
+from pathlib import Path
+
+
+# # Define Data Path
+
+# In[101]:
+
+
+# Define data folder
+data_folder = Path("../data")
+
+
+# # Loading the Dataset
+
+# In[102]:
+
+
+# Load cleaned dataset
+sales_df = pl.read_parquet(data_folder /"sales_cleaned.parquet")
+
+# Preview dataset
+sales_df.head()
+
+
+# # Product Performance
+
+# In[103]:
+
+
+# Calculate product performance
+product_performance = (
+    sales_df.group_by(["product_id","product_name","category"])
+    .agg(
+        # number of transactions
+        pl.len().alias("transactions"),
+
+        # total revenue
+        pl.col("revenue").sum().alias("total_revenue"),
+
+        # average product price
+        pl.col("revenue").mean().alias("avg_price")
+
+    )
+)
+
+product_performance.head()
+
+
+# # Sort Top and Bottom Products
+
+# In[104]:
+
+
+# Sort top products by revenue
+top_products = (product_performance.sort("total_revenue",descending=True))
+
+top_products.head()
+
+
+# In[105]:
+
+
+# Sort Bottom products by revenue
+bottom_products = (product_performance.sort("total_revenue",descending=False))
+
+bottom_products.head()
+
+
+# # Category Performance
+
+# In[106]:
+
+
+# Revenue by category
+category_performance = (
+    sales_df.group_by(["category"])
+    .agg(
+        pl.len().alias("transactions"),
+
+        pl.col("revenue").sum().alias("total_revenue"),
+
+        pl.col("revenue").mean().alias("avg_order_value")
+    )
+    .sort("total_revenue", descending=True)
+)
+
+category_performance.sort("total_revenue",descending = True).head()
+
+
+# # City Performance
+
+# In[107]:
+
+
+# Revenue by city
+city_performance = (
+    sales_df.group_by(["city"])
+    .agg(
+        pl.len().alias("transactions"),
+
+        pl.col("revenue").sum().alias("total_revenue"),
+
+        pl.col("revenue").mean().alias("avg_order_value")
+    )
+    .sort("total_revenue", descending=True)
+)
+
+city_performance.sort("avg_order_value",descending = True).head()
+
+
+# In[108]:
+
+
+city_performance.sort("total_revenue",descending = True).head()
+
+
+# In[109]:
+
+
+city_performance.sort("transactions",descending = True).head()
+
+
+# ## Pareto Analysis (80/20 Rule)
+# Checking wether few products drive most revenue
+
+# In[110]:
+
+
+# Add revenue share 
+products_pareto = (
+    top_products.with_columns(
+        (pl.col("total_revenue") / 
+        pl.col("total_revenue").sum()
+        ).alias("revenue_share")
+    )
+)
+
+products_pareto.sort("revenue_share",descending = True)
+
+
+# ## Revenue Share
+
+# In[111]:
+
+
+product_performance = product_performance.with_columns(
+    (pl.col("total_revenue") / pl.col("total_revenue").sum()*100).round(2).alias("revenue_share_pct" )
+)
+
+product_performance.sort("revenue_share_pct",descending = True)
+
+
+# # Adding cumulative column to the product table
+
+# In[112]:
+
+
+# Sort products by revenue
+product_performance = product_performance.sort(
+    "total_revenue",descending=True    
+)
+
+# Add cumulative revenue column
+product_performance = product_performance.with_columns(
+
+    # cumulative revenue
+    pl.col("total_revenue").cum_sum().alias("cumulative_revenue"),
+
+    # cumulative revenue percentage
+    (
+        pl.col("total_revenue").cum_sum()
+        /
+        pl.col("total_revenue").sum()
+        * 100
+    ).round(2).alias("cumulative_revenue_pct")
+)
+
+# view table
+product_performance
+
+
+# ## Save the Datasets
+
+# In[113]:
+
+
+# Save product dataset
+product_performance.write_parquet(data_folder/"product_performance.parquet")
+
+# Save category dataset
+category_performance.write_parquet(data_folder/"category_performance.parquet")
+
+# Save city dataset
+city_performance.write_parquet(data_folder/"city_performance.parquet")
+
+# Save top products dataset
+top_products.write_parquet(data_folder/"top_products.parquet")
+
+
+# In[114]:
+
+
+top_products.head(10)
+
+
+# In[115]:
+
+
+category_performance
+
+
+# In[116]:
+
+
+product_performance.select(pl.col("total_revenue").sum())
+
+
+# # 07_day7_festival_analysis.ipynb
+# ==================================================
+
+# # Imports
+# 
+
+# In[32]:
+
+
+# Import required libraries
+import polars as pl
+from pathlib import Path
+
+
+# # Data Path
+# 
+
+# In[33]:
+
+
+# Define data folder path
+data_folder = Path("../data")
+
+
+# # Load Dataset
+# 
+
+# In[34]:
+
+
+# Load cleaned sales dataset
+sales_df = pl.read_parquet(data_folder / "sales_cleaned.parquet")
+
+# Preview data
+sales_df.head()
+
+
+# ## Festival vs Non-Festival Sales
+# 
+
+# In[35]:
+
+
+# Revenue comparison between festival and normal days
+festival_sales = sales_df.group_by("festival").agg(
+    pl.count().alias("transactions"),
+
+    pl.col("revenue").sum().alias("total_revenue"),
+
+    pl.col("revenue").mean().round().alias("avg_order_value")
+)
+
+festival_sales.sort("total_revenue", descending=True)
+
+
+# ## Festival Revenue Share
+# 
+
+# In[36]:
+
+
+festival_sales = festival_sales.with_columns(
+    (
+        pl.col("total_revenue") / pl.col("total_revenue").sum() * 100
+    ).round(1).alias("revenue_share_pct")
+)
+
+festival_sales
+
+
+# ## Festival Category Performance
+# 
+
+# In[37]:
+
+
+festival_category = sales_df.group_by(
+    ["festival", "category"]
+).agg(
+    pl.count().alias("transactions"),
+
+    pl.col("revenue").sum().alias("total_revenue")
+).sort(
+    ["festival", "total_revenue"],
+    descending=[False, True]
+)
+
+festival_category
+
+
+# # City Festival Performance
+# 
+
+# In[38]:
+
+
+festival_city = sales_df.group_by(
+    ["festival", "city"]
+).agg(
+    pl.count().alias("transactions"),
+
+    pl.col("revenue").sum().alias("total_revenue")
+).sort(
+    ["festival", "total_revenue"],
+    descending=[False, True]
+)
+
+festival_city.head(10)
+
+
+# In[39]:
+
+
+import polars as pl
+
+# Aggregate sales by city
+city_summary = (
+    sales_df.group_by("city")
+    .agg([
+        pl.count("transaction_id").alias(
+            "transactions"),  # total transactions per city
+        # total revenue per city
+        pl.sum("revenue").alias("total_revenue")
+    ])
+    .with_columns(
+        # average revenue per transaction
+        (pl.col("total_revenue") / pl.col("transactions")
+         ).round().alias("avg_revenue_per_txn")
+    )
+)
+
+city_summary.sort("avg_revenue_per_txn", descending=True)
+
+
+# ## Save the Data set
+# 
+
+# In[40]:
+
+
+festival_sales.write_parquet(data_folder/"festival_sales.parquet")
+
+
+# In[41]:
+
+
+festival_sales
+
+
+# # 08_day8_city_analysis.ipynb
+# ==================================================
+
+# ## Imports
+
+# In[12]:
+
+
+import polars as pl
+from pathlib import Path
+
+
+# # Data Path
+
+# In[13]:
+
+
+data_folder = Path("../data")
+
+
+# ## Load Dataset
+
+# In[14]:
+
+
+sales_df = pl.read_parquet(data_folder / "sales_cleaned.parquet")
+
+# Preview dataset
+sales_df.head()
+
+
+# ## Total Revenue and Transactions by City
+
+# In[15]:
+
+
+city_performance = sales_df.group_by(["city"]).agg (
+    pl.count().alias("transactions"),
+    pl.col("revenue").sum().alias("total_revenue"),
+    pl.col("price").mean().round().alias("average_order_value")
+).sort("total_revenue", descending=True)
+
+city_performance
+
+
+# ## Festival Sales by City
+
+# In[16]:
+
+
+festival_city = sales_df.group_by(["festival", "city"]).agg (
+    pl.count().alias("transactions"),
+    pl.col("revenue").sum().alias("total_revenue")
+).sort(["festival", "total_revenue"], descending=[False, True])
+
+festival_city.head(10)
+
+
+# # City Revenue Share
+
+# In[19]:
+
+
+city_performance = city_performance.with_columns(
+   (
+     pl.col("total_revenue")/pl.col("total_revenue").sum() * 100 
+   ).round(1).alias("revenue_share_pct")
+)
+
+city_performance.sort("revenue_share_pct",descending = True)
+
+
+# In[20]:
+
+
+festival_city = sales_df.group_by(["festival", "city"]).agg(
+    pl.count().alias("transactions"),
+    pl.col("revenue").sum().alias("total_revenue")
+).sort(["festival", "total_revenue"], descending=[False, True])
+
+festival_city.head(10)
+
+
+# # Save Outputs
+
+# In[21]:
+
+
+city_performance.write_parquet(data_folder / "city_performance.parquet")
+festival_city.write_parquet(data_folder / "festival_city.parquet")
+
+
+# # 09_day9_sales_trends.ipynb
+# ==================================================
+
+# ## Imports
+# 
+
+# In[18]:
+
+
+import polars as pl
+from pathlib import Path
+
+
+# # Data Path
+# 
+
+# In[19]:
+
+
+data_folder = Path("../data")
+
+
+# # Load Dataset
+# 
+
+# In[20]:
+
+
+sales_df = pl.read_parquet(
+    data_folder / "sales_cleaned.parquet"
+)
+
+# Preview Dataset
+sales_df.head()
+
+
+# ## Create Year-Month Column
+# 
+
+# In[21]:
+
+
+# Extract year-month for aggregation
+sales_df = sales_df.with_columns(
+    pl.col("purchase_date").dt.strftime("%Y-%m").alias("year_month")
+)
+
+
+# # Monthly Sales Trends
+# 
+
+# In[22]:
+
+
+monthly_sales = sales_df.group_by("year_month").agg(
+    pl.count().alias("transactions"),
+    pl.col("revenue").sum().alias("total_revenue"),
+    pl.col("price").mean().round().alias("average_order_value")
+).sort("year_month")
+
+monthly_sales
+
+
+# # Revenue Share by Month
+# 
+
+# In[23]:
+
+
+monthly_sales = monthly_sales.with_columns(
+    (
+        pl.col("total_revenue") / pl.col("total_revenue").sum() * 100
+    ).round().alias("revenue_share_pct")
+)
+
+monthly_sales.sort("revenue_share_pct", descending=True)
+
+
+# # Festival Monthly Trends
+# 
+
+# In[ ]:
+
+
+monthly_festival_sales = sales_df.group_by(["year_month", "festival"]
+                                           ).agg(
+    pl.count().alias("transactions"),
+    pl.col("revenue").sum().alias("total_revenue")
+).sort(["year_month", "total_revenue"], descending=[False, True])
+
+monthly_festival_sales.head(10)
+
+
+# # Adding month column to sales_df
+# 
+
+# In[25]:
+
+
+sales_df = sales_df.with_columns(
+    pl.col("purchase_date").dt.strftime("%B").alias("month_name")
+)
+
+
+# # Save Outputs
+# 
+
+# In[ ]:
+
+
+monthly_festival_sales.write_parquet(
+    data_folder / "monthly_festival_sales.parquet")
+monthly_sales.write_parquet(data_folder / "monthly_sales.parquet")
+
+
+# In[27]:
+
+
+monthly_sales
+
+
+# In[28]:
+
+
+monthly_festival_sales
+
+
+# In[29]:
+
+
+sales_df
+
+
+# In[ ]:
+
+
+
+
+
+# # 10_day10_customer_segmentation.ipynb
+# ==================================================
+
+# ## Imports
+# 
+
+# In[1]:
+
+
+import polars as pl
+from pathlib import Path
+
+
+# # Data Path
+# 
+
+# In[2]:
+
+
+data_folder = Path("../data")
+
+
+# # Load Dataset
+# 
+
+# In[3]:
+
+
+sales_df = pl.read_parquet(
+    data_folder / "sales_cleaned.parquet"
+)
+
+# Preview Dataset
+sales_df.head()
+
+
+# ## Customer Metrics
+# 
+
+# In[5]:
+
+
+customer_metrics = sales_df.group_by("customer_id").agg(
+    pl.count().alias("total_orders"),
+    pl.col("revenue").sum().alias("total_spent"),
+    pl.col("revenue").mean().alias("avg_order_value"),
+    pl.col("purchase_date").min().alias("first_purchase"),
+    pl.col("purchase_date").max().alias("last_purchase")
+)
+
+customer_metrics
+
+
+# ## Customer Lifetime
+# 
+
+# In[ ]:
+
+
+customer_metrics = customer_metrics.with_columns(
+    (
+        pl.col("last_purchase") - pl.col("first_purchase")
+    ).dt.total_days().alias("customer_lifetime_days")
+)
+
+
+# # Purchase Frequency
+# 
+
+# In[7]:
+
+
+customer_metrics = customer_metrics.with_columns(
+    (
+        pl.col("total_orders") / (pl.col("customer_lifetime_days") + 1)
+    ).alias("purchase_frequency")
+)
+
+
+# ## Customer Segments
+# 
+
+# In[ ]:
+
+
+customer_metrics = customer_metrics.with_columns(
+    pl.when(pl.col("total_spent") > 20000)
+    .then(pl.lit("VIP"))
+
+    .when(pl.col("total_spent") > 10000)
+    .then(pl.lit("Loyal"))
+
+    .when(pl.col("total_spent") > 5000)
+    .then(pl.lit("Regular"))
+
+    .otherwise(pl.lit("Low Value"))
+    .alias("customer_type")
+)
+
+
+# # Segment Distribution
+# 
+
+# In[10]:
+
+
+segment_distribution = customer_metrics.group_by("customer_type").agg(
+    pl.count().alias("customers"),
+    pl.col("total_spent").sum().alias("segment_revenue"),
+).sort("segment_revenue", descending=True)
+
+# Adding revenue_share_pct column
+
+segment_distribution = segment_distribution.with_columns(
+
+    (
+        pl.col("segment_revenue")/pl.col("segment_revenue").sum() * 100
+
+    ).round().alias("revenue_share_pct")
+
+)
+
+segment_distribution
+
+
+# Save the dataset
+# 
+
+# In[11]:
+
+
+customer_metrics.write_parquet(data_folder/"customer_metrics.parquet")
+
+
+# # 11_day11_duckdb_analysis.ipynb
+# ==================================================
+
+# # Imports
+# 
+
+# In[40]:
+
+
+import duckdb
+import polars as pl
+from pathlib import Path
+
+
+# # Data Path
+# 
+
+# In[41]:
+
+
+data_folder = Path("../data")
+
+
+# # Connect to DuckDB
+# 
+
+# In[42]:
+
+
+con = duckdb.connect()
+
+
+# ## Query Parquet File
+# 
+
+# In[43]:
+
+
+sales = con.execute(f"""
+    select * from read_parquet('{data_folder}/sales_cleaned.parquet')
+    limit 5
+""").fetchdf()
+
+sales
+
+
+# # SQL Revenue by Category
+# 
+
+# In[44]:
+
+
+category_sales = con.execute(f"""
+
+    select category,
+    count(*) as transactions,
+    sum(revenue) as total_revenue,
+    round(avg(revenue)) as avg_order_value
+    from read_parquet('{data_folder}/sales_cleaned.parquet')
+    group by category
+    order by total_revenue desc                         
+
+    """).fetchdf()
+
+print(category_sales)
+
+
+# # SQL Monthly Revenue
+# 
+
+# In[45]:
+
+
+monthly_sale_sql = con.execute(f"""
+
+    select strftime('%Y-%m',purchase_date) as month,
+    count(*) as transactions,
+    sum(revenue) as total_revenue,
+    from read_parquet('{data_folder}/sales_cleaned.parquet')
+    group by month
+    order by month
+
+    """).fetchdf()
+
+print(monthly_sale_sql)
+
+
+# # Customer Segmentation SQL Table
+# 
+
+# In[46]:
+
+
+customer_metrics_sql = con.execute(f"""
+
+    select customer_id,
+    count(*) as total_orders,
+    sum(revenue) as total_spent,
+    avg(revenue) as avg_order_value,
+    min(purchase_date) as first_purchase,
+    max(purchase_date) as last_purchase,
+    from read_parquet('{data_folder}/sales_cleaned.parquet')
+    group by customer_id
+
+    """).fetchdf()
+
+customer_metrics_sql.head()
+
+
+# # City Performance SQL Table
+# 
+
+# In[47]:
+
+
+city_performance_sql = con.execute(f"""
+
+    select city,
+    count(*) as transactions,
+    sum(revenue) as total_revenue,
+    round(sum(revenue) * 100.0 /sum(sum(revenue)) over(),2) as revenue_share_pct
+    from read_parquet('{data_folder}/sales_cleaned.parquet')
+    group by city
+    order by total_revenue desc                        
+
+    """).fetchdf()
+
+print(city_performance_sql)
+
+
+# # Festival & Monthly Analysis
+# 
+
+# In[48]:
+
+
+monthly_festival_sql = con.execute(f"""
+
+    select strftime('%Y-%m',purchase_date) as month,
+    festival,
+    count(*) as transactions,
+    sum(revenue) as total_revenue,
+    from read_parquet('{data_folder}/sales_cleaned.parquet')
+    group by month,festival
+    order by month
+
+    """).fetchdf()
+
+print(monthly_festival_sql)
+
+
+# # Product performance table
+# 
+
+# In[49]:
+
+
+product_perf_sql = con.execute(f"""
+
+    select product_name,
+    category,
+    count(*) as transactions,
+    sum(revenue) as total_revenue,
+    round(avg(revenue)) as avg_order_value
+    from read_parquet('{data_folder}/sales_cleaned.parquet')
+    group by product_name,category
+    order by total_revenue desc                         
+
+    """).fetchdf()
+
+print(product_perf_sql)
+
+
+# # Save BI-ready tables to Parquet
+# 
+
+# In[ ]:
+
+
+customer_metrics_sql.to_parquet(
+    data_folder / "customer_metrics_duckdb.parquet")
+city_performance_sql.to_parquet(
+    data_folder / "city_performance_duckdb.parquet")
+monthly_festival_sql.to_parquet(
+    data_folder / "monthly_festival_duckdb.parquet")
+product_perf_sql.to_parquet(data_folder / "products_perf_duckdb.parquet")
+
+
+# ## Verify the Parquet files
+# 
+
+# In[52]:
+
+
+print("Customer metrics rows:", len(customer_metrics_sql))
+print("City performance rows:", len(city_performance_sql))
+print("Monthly festival rows:", len(monthly_festival_sql))
+print("Product performance rows:", len(product_perf_sql))
+

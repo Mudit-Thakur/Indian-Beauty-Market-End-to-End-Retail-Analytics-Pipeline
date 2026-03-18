@@ -170,8 +170,8 @@ pip install -r requirements.txt
 
 | Document | Description |
 |---|---|
-| [DATA_DICTIONARY.md](DATA_DICTIONARY.md) | All fields, data types, generation logic, and synthetic data limitations |
-| [EXECUTIVE_REPORT.md](EXECUTIVE_REPORT.md) | Full KPI results — products, customers, festivals, cities, RFM |
+| [DATA_DICTIONARY.md](https://github.com/Mudit-Thakur/Indian-Beauty-Market-Analytics-Dashboard/blob/main/data%20dict%20%26%20report/DATA_DICTIONARY.md) | All fields, data types, generation logic, and synthetic data limitations |
+| [EXECUTIVE_REPORT.md](https://github.com/Mudit-Thakur/Indian-Beauty-Market-Analytics-Dashboard/blob/main/data%20dict%20%26%20report/EXECUTIVE_REPORT.md) | Full KPI results — products, customers, festivals, cities, RFM |
 
 ---
 

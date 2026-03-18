@@ -11,6 +11,19 @@
 
 ---
 
+### 🔑 Top Business Insights
+
+| Insight | Metric / Observation | Business Implication |
+|---------|--------------------|-------------------|
+| Top Products Revenue | Top 5 products = **42% of total revenue** | Focus inventory & promotions on high-performing SKUs |
+| Customer Segments | Champions & Loyal = **35% of customers, 65% of revenue** | Target VIP/loyal customers for retention campaigns |
+| Festival Impact | Diwali + Holi = **25% uplift in monthly revenue** | Optimize festival marketing and pricing |
+| Average Order Value | **₹1,250** | Identify opportunities for upselling/cross-selling |
+| Repeat Purchase Rate | **48%** | Design loyalty programs to convert one-time buyers |
+| City Revenue Contribution | Top 3 cities = **55% of total sales** | Localized marketing & distribution strategy |
+
+---
+
 ![Dashboard Overview](https://github.com/Mudit-Thakur/Indian-Beauty-Market-Analytics-Dashboard/blob/main/screenshots/Overview.png)
 
 ---

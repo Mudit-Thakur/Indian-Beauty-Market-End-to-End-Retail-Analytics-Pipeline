@@ -146,11 +146,10 @@ Indian-Beauty-Market-Analytics-Dashboard/
 │   └── 11_day11_duckdb_analysis.ipynb       # SQL analytics on Parquet
 │
 ├── screenshots and reports/
-├── DATA_DICTIONARY.md                       # ← Field definitions & generation logic
-├── EXECUTIVE_REPORT.md                      # ← Full KPI results with numbers
+    ├── DATA_DICTIONARY.md                       # ← Field definitions & generation logic
+    └── EXECUTIVE_REPORT.md                      # ← Full KPI results with numbers
 └── README.md
 ```
-
 ---
 
 ## ⚡ Quickstart

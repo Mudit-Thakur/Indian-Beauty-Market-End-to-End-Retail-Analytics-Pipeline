@@ -175,7 +175,7 @@ pip install -r requirements.txt
 
 ---
 
-## 🔮 Roadmap
+## 🔮 Future Enhancement
 
 - [ ] Real-time dashboard via live sales API integration
 - [ ] Demand forecasting with Prophet / XGBoost

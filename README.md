@@ -1,12 +1,14 @@
 # Indian Beauty Market Analytics Dashboard
 
-**End-to-end retail analytics pipeline** — synthetic data generation → ETL → SQL analytics → RFM segmentation → Power BI dashboards.
+**End-to-end retail analytics pipeline** — synthetic data generation → ETL → SQL analytics → RFM segmentation → Power BI dashboards → **AI conversational analytics layer.**
 
-**Stack:** Python · Polars · DuckDB · Power BI · Parquet · Faker
+**Stack:** Python · Polars · DuckDB · Power BI · Parquet · LangChain · Groq LLaMA 3.3
 
 [![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=flat&logo=python&logoColor=white)](https://python.org)
 [![DuckDB](https://img.shields.io/badge/DuckDB-0.10-FFC300?style=flat)](https://duckdb.org)
 [![Power BI](https://img.shields.io/badge/Power%20BI-Dashboard-F2C811?style=flat&logo=powerbi&logoColor=black)](https://powerbi.microsoft.com)
+[![LangChain](https://img.shields.io/badge/LangChain-Agent-1C3C3C?style=flat)](https://langchain.com)
+[![Groq](https://img.shields.io/badge/Groq-LLaMA%203.3-F55036?style=flat)](https://groq.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 ---
@@ -37,6 +39,52 @@ Simulates a full FY 2024 analytics cycle for an Indian D2C beauty brand — 50,0
 
 ---
 
+## 🤖 AI Analytics Agent
+
+Built a conversational AI layer on top of this pipeline — non-technical stakeholders can query the entire dataset in plain English without writing a single line of SQL.
+
+### Demo
+
+![AI Agent Demo](https://github.com/Mudit-Thakur/Indian-Beauty-Market-Analytics-Dashboard/raw/main/screenshots/ai_agent_demo.png)
+
+### How It Works
+```
+User asks plain English question
+        ↓
+LangChain + Groq LLaMA 3.3 converts to SQL
+        ↓
+DuckDB executes query on Parquet files
+        ↓
+LLM explains results in business language
+        ↓
+Conversation memory retains last 5 exchanges
+        ↓
+Chat history auto-saved to log file
+```
+
+### Key Features
+
+- **Natural language to SQL** — no technical knowledge needed
+- **Conversation memory** — remembers last 5 questions for context-aware follow-ups
+- **Business insights** — every result explained in plain English with recommendations
+- **Chat history logging** — all sessions automatically saved to file
+- **DuckDB + Parquet** — sub-second query responses on 50,000 transactions
+
+### Run The AI Agent
+```bash
+# Install additional dependencies
+pip install langchain langchain-community langchain-groq python-dotenv
+
+# Set up environment variables
+cp ai_agent/.env.example ai_agent/.env
+# Add your Groq API key to .env file
+
+# Run the agent
+python ai_agent/beauty_agent.py
+```
+
+---
+
 ## Dashboards
 
 ![Overview](https://github.com/Mudit-Thakur/Indian-Beauty-Market-Analytics-Dashboard/blob/main/screenshots/Overview.png)
@@ -52,7 +100,6 @@ Simulates a full FY 2024 analytics cycle for an Indian D2C beauty brand — 50,0
 ---
 
 ## Pipeline Architecture
-
 ```
 Raw Data Generation (Python + Faker + NumPy)
         │
@@ -71,8 +118,10 @@ SQL Analytics (DuckDB — window functions, CTEs, aggregations)
         ├── Festival Revenue Attribution
         └── City-Level Geographic Analysis
                 │
-                ▼
-        Power BI Dashboards (drill-down, cross-filtered)
+                ├── Power BI Dashboards (drill-down, cross-filtered)
+                │
+                └── AI Analytics Agent (LangChain + Groq + DuckDB)
+                        └── Plain English Q&A → Business Insights
 ```
 
 ---
@@ -116,14 +165,18 @@ SQL Analytics (DuckDB — window functions, CTEs, aggregations)
 | Storage | Parquet | Columnar format; DuckDB reads it 10× faster than CSV |
 | SQL Analytics | **DuckDB** | Runs analytical SQL directly on Parquet files — no database server needed |
 | Visualization | **Power BI** | Industry-standard BI tool; drill-through + cross-filter support |
+| AI Agent | **LangChain + Groq** | Natural language to SQL with business insight generation |
 | Version Control | Git & GitHub | Full commit history, reproducibility |
 
 ---
 
 ## Project Structure
-
 ```
 Indian-Beauty-Market-Analytics-Dashboard/
+│
+├── ai_agent/
+│   ├── beauty_agent.py           # AI analytics agent
+│   └── .env.example              # API key template
 │
 ├── pipelines/
 │   └── etl_pipeline.py           # Full data generation + ETL pipeline
@@ -146,25 +199,25 @@ Indian-Beauty-Market-Analytics-Dashboard/
 │   └── monthly_sales.parquet
 │
 ├── notebooks/
-│   ├── 01_day1_generate_code.ipynb          # Synthetic data generation
-│   ├── 02_day2_data_cleaning.ipynb          # ETL & schema validation
-│   ├── 03_day3_rfm_analysis.ipynb           # RFM scoring & segmentation
-│   ├── 04_day4_cohort_retention.ipynb       # Cohort retention matrix
-│   ├── 05_day5_customer_behavior.ipynb      # Behavioral KPIs
-│   ├── 06_day6_product_performance.ipynb    # Pareto & SKU ranking
-│   ├── 07_day7_festival_analysis.ipynb      # Festival revenue impact
-│   ├── 08_day8_city_analysis.ipynb          # Geographic analytics
-│   ├── 09_day9_sales_trends.ipynb           # Monthly trends & seasonality
-│   ├── 10_day10_customer_segmentation.ipynb # VIP / Loyal / Regular tiering
-│   └── 11_day11_duckdb_analysis.ipynb       # SQL analytics on Parquet
+│   ├── 01_day1_generate_code.ipynb
+│   ├── 02_day2_data_cleaning.ipynb
+│   ├── 03_day3_rfm_analysis.ipynb
+│   ├── 04_day4_cohort_retention.ipynb
+│   ├── 05_day5_customer_behavior.ipynb
+│   ├── 06_day6_product_performance.ipynb
+│   ├── 07_day7_festival_analysis.ipynb
+│   ├── 08_day8_city_analysis.ipynb
+│   ├── 09_day9_sales_trends.ipynb
+│   ├── 10_day10_customer_segmentation.ipynb
+│   └── 11_day11_duckdb_analysis.ipynb
 │
-├── dashboard/                    # Power BI .pbix file
-│
+├── dashboard/
 ├── data dict & report/
-│   ├── DATA_DICTIONARY.md        # Field definitions, generation logic, synthetic data limitations
-│   └── EXECUTIVE_REPORT.md       # Full KPI results with numbers
-│
+│   ├── DATA_DICTIONARY.md
+│   └── EXECUTIVE_REPORT.md
 ├── screenshots/
+│   └── ai_agent_demo.png
+├── requirements.txt
 └── README.md
 ```
 
@@ -173,7 +226,6 @@ Indian-Beauty-Market-Analytics-Dashboard/
 ## Quickstart
 
 **Prerequisites:** Python 3.10+, pip
-
 ```bash
 # 1. Clone the repo
 git clone https://github.com/Mudit-Thakur/Indian-Beauty-Market-Analytics-Dashboard.git
@@ -187,11 +239,14 @@ python pipelines/etl_pipeline.py
 
 # 3b. Or run ETL only (if raw CSVs already exist)
 python pipelines/etl_pipeline.py --clean
+
+# 4. Run AI agent
+python ai_agent/beauty_agent.py
 ```
 
 **To explore interactively:** Run notebooks in order (01 → 11). Each notebook depends on outputs from the previous one.
 
-**To view dashboards:** Open `dashboard/*.pbix` in Power BI Desktop (free download at powerbi.microsoft.com).
+**To view dashboards:** Open `dashboard/*.pbix` in Power BI Desktop.
 
 ---
 
@@ -209,22 +264,25 @@ python pipelines/etl_pipeline.py --clean
 - **ETL pipeline design** — modular, parameterized, production-style Python scripts
 - **Analytical SQL** — window functions, CTEs, aggregations, multi-table joins via DuckDB
 - **Customer analytics** — RFM scoring, cohort retention, churn identification
+- **AI analytics agent** — LangChain + Groq LLaMA 3.3 natural language to SQL
+- **Conversation memory** — context-aware multi-turn analytics conversations
 - **Business communication** — every metric tied to a decision or recommended action
-- **Modern data stack** — Polars + DuckDB + Parquet (the stack replacing Pandas + SQL Server in 2024–2025)
+- **Modern data stack** — Polars + DuckDB + Parquet + LangChain
 - **BI dashboarding** — drill-through, cross-filtering, executive-level layout in Power BI
 
 ---
 
 ## Roadmap
 
+- [x] AI conversational analytics agent
 - [ ] Demand forecasting with Prophet or XGBoost
-- [ ] ML-based customer clustering (K-Means / DBSCAN) to validate RFM segments
-- [ ] Multi-category comparative dashboards (Beauty vs. Personal Care vs. Wellness)
+- [ ] ML-based customer clustering (K-Means / DBSCAN)
+- [ ] Multi-category comparative dashboards
 - [ ] Live sales API integration for real-time dashboard refresh
 
 ---
 
 ## Contact
 
-**Mudit Thakur**  
+**Mudit Thakur**
 [GitHub](https://github.com/Mudit-Thakur) · [Email](mailto:muditthakur918@gmail.com)

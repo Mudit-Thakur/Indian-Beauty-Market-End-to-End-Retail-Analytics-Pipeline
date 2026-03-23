@@ -45,7 +45,7 @@ Built a conversational AI layer on top of this pipeline — non-technical stakeh
 
 ### Demo
 
-![AI Agent Demo](https://github.com/Mudit-Thakur/Indian-Beauty-Market-Analytics-Dashboard/raw/main/screenshots/ai_agent_demo.png)
+![AI Agent Demo](https://github.com/Mudit-Thakur/Indian-Beauty-Market-Analytics-Dashboard/blob/main/ai_agent/ai_agent_demo.png)
 
 ### How It Works
 ```
